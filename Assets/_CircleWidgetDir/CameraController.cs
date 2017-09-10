@@ -14,12 +14,18 @@ public class CameraController : MonoBehaviour {
 
     public float zoomSpeed = 50.0f;
 
-    float rotationY = 0.0f;
-    float rotationX = 0.0f;
+    public float minAngle = 60.0f;
+    public float maxAngle = 120.0f;
 
-    public int maxAngle = 60;
+    const string RIGHT_W_TAG_NAME = "RightWidget";
+    const string LEFT_W_TAG_NAME  = "LeftWidget";
+
+    private int rotationMultiplier = 1;
 
     protected Vector3 rot;
+
+    protected float rotationY = 0.0f;
+    protected float rotationX = 0.0f;
 
     protected bool acceptableAngle = false;
     protected bool isCameraInWidgetArea = false;
@@ -66,16 +72,22 @@ public class CameraController : MonoBehaviour {
 
     public void OnTriggerEnter(Collider other)
     {
-        Debug.Log("on trigger enter ");
+        
         isCameraInWidgetArea = true;
         controller = other.GetComponent<CircleWidgetController>();
+        string tag = other.gameObject.tag;
+        
+        rotationMultiplier = 1;
+        if (tag.ToString() == RIGHT_W_TAG_NAME)
+        {
+            rotationMultiplier = -1;
+        }
     }
 
     public void OnTriggerExit(Collider other)
     {
-        Debug.Log("on trigger exit");
         isCameraInWidgetArea = false;
-       
+        rotationMultiplier = 0;
     }
     
     protected void CameraDeltaRotation()
@@ -83,18 +95,36 @@ public class CameraController : MonoBehaviour {
         Vector3 currentRotation = transform.localEulerAngles;
         float diffX = Mathf.DeltaAngle(currentRotation.y, rot.y);
 
-        if (diffX > maxAngle || diffX < (maxAngle * -1))
-        {
-            Debug.Log("Acceptable angle true");
-            acceptableAngle = true;
-        } else if (diffX < maxAngle || diffX > (maxAngle * -1))
-        {
-            Debug.Log("Acceptable angle false");
-            acceptableAngle = false;
-        }
+        float localMinAngle = minAngle * rotationMultiplier;
+        float localMaxAngle = maxAngle * rotationMultiplier;
 
+        if (rotationMultiplier == 1)
+        {
+            if (diffX > localMinAngle && diffX < localMaxAngle)
+            {
+                acceptableAngle = true;
+            }
+            else
+            {
+                acceptableAngle = false;
+            }
+        }
+        else if (rotationMultiplier == -1)
+        {
+            if (diffX < localMinAngle && diffX > localMaxAngle)
+            {
+                acceptableAngle = true;
+            }
+            else
+            {
+                acceptableAngle = false;
+            }
+        }
+        
         ShowWidget();
     }
+
+
 
     protected void MoveMouse()
     {
@@ -115,19 +145,19 @@ public class CameraController : MonoBehaviour {
 
     protected void InputAxis()
     {
-        if (Input.GetKey(KeyCode.RightArrow))
+        if (Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.D))
         {
             transform.position = new Vector3(transform.position.x + speed, transform.position.y, transform.position.z);
         }
-        if (Input.GetKey(KeyCode.LeftArrow))
+        if (Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.A))
         {
             transform.position = new Vector3(transform.position.x - speed, transform.position.y, transform.position.z);
         }
-        if (Input.GetKey(KeyCode.UpArrow))
+        if (Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.W))
         {
             transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.z + speed);
         }
-        if (Input.GetKey(KeyCode.DownArrow))
+        if (Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.S))
         {
             transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.z - speed);
         }

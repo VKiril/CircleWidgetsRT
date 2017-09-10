@@ -8,14 +8,13 @@ public class CircleWidgetController : MonoBehaviour {
     protected Animator _animator;
     public Camera cam;
 
-    public GameObject circleWidget;
+    //public GameObject circleWidget;
     public GameObject cameraHolder;
     public float speed = 5;
 
     void Start()
     {
         _animator = GetComponent<Animator>();
-        circleWidget = GameObject.Find("Canvas/CircleWidget");
         cameraHolder = GameObject.Find("MainCamera");
         cam = cameraHolder.GetComponent<Camera>();
     }
@@ -51,15 +50,8 @@ public class CircleWidgetController : MonoBehaviour {
         IsPlayingSecondary = value;
     }
 
-    public void TestFunction()
+    public void CentralButtonClick()
     {
-        Debug.Log("test button was clicked.");
-    }
-
-    public void MainButtonClick()
-    {
-        Debug.Log(" main button pressed ");
-
         if (IsPlayingSecondary == true)
         {
             IsPlayingSecondary = false;
@@ -71,15 +63,6 @@ public class CircleWidgetController : MonoBehaviour {
             _animator.speed = 1.5f;
         }
     }
-
-    public void showWidget(bool visibility)
-    {
-        circleWidget.SetActive(visibility);
-    }
-
-
-
-
 
     public void ButtonUpLeftClick()
     {
